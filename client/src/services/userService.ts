@@ -28,3 +28,4 @@ export const fetchUser = async (): Promise<UserProfile> => {
   await new Promise((resolve) => setTimeout(resolve, 300));
   return user as UserProfile;
 };
+

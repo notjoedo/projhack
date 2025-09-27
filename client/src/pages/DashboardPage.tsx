@@ -7,8 +7,19 @@ import { DetailedViewModal } from "../components/DetailedViewModal";
 import { fetchListings } from "../services/listingService";
 import { Listing } from "../types";
 
-export function DashboardPage() {
-  const [listings, setListings] = useState<Listing[]>([]);
+interface DashboardPageProps {
+  listings: Listing[];
+  onCardClick: (id: number) => void;
+  isLoggedIn: boolean;
+  onLogin: () => void;
+}
+
+export function DashboardPage({
+  listings,
+  onCardClick,
+  isLoggedIn,
+  onLogin,
+}: DashboardPageProps) {
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: "private" | "external";
@@ -26,12 +37,12 @@ export function DashboardPage() {
   });
 
   // Mock user state - can toggle between logged in/out for demonstration
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  // const [isLoggedIn, setIsLoggedIn] = useState(true); // This line is removed as per the new_code
 
   useEffect(() => {
     const loadListings = async () => {
       const data = await fetchListings();
-      setListings(data);
+      // setListings(data); // This line is removed as per the new_code
     };
 
     loadListings();
@@ -55,7 +66,7 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Banner />
+      {!isLoggedIn && <Banner />}
       <SearchBar />
 
       {/* Main Content */}
@@ -68,7 +79,7 @@ export function DashboardPage() {
               {...listing}
               isLoggedIn={isLoggedIn}
               onInterested={handleInterested}
-              onViewDetails={handleViewDetails}
+              onViewDetails={onCardClick}
             />
           ))}
         </div>
@@ -79,6 +90,8 @@ export function DashboardPage() {
         isOpen={modalState.isOpen}
         onClose={closeModal}
         type={modalState.type}
+        isLoggedIn={isLoggedIn}
+        onLogin={onLogin}
       />
 
       {/* Detailed View Modal */}

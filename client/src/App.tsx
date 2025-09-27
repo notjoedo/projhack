@@ -122,7 +122,12 @@ function App() {
         />
         <main className="flex-1 overflow-y-auto bg-gray-50">
           {currentPage === "dashboard" && (
-            <DashboardPage listings={listings} onCardClick={handleCardClick} />
+            <DashboardPage
+              listings={listings}
+              onCardClick={handleCardClick}
+              isLoggedIn={isLoggedIn}
+              onLogin={handleLogin}
+            />
           )}
           {currentPage === "inquiries" && <InquiriesPage />}
           {currentPage === "listing" && <MyListingPage />}
