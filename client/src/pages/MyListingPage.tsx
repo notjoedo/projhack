@@ -1,23 +1,24 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { ListingCard } from "./ListingCard";
-import { ListingPerformance } from "./ListingPerformance";
+import { Button } from "../components/ui/button";
+import { ListingCard } from "../components/ListingCard";
+import { ListingPerformance } from "../components/ListingPerformance";
 import { Trash2, Home } from "lucide-react";
 
 export function MyListingPage() {
   // Toggle this state to demo both views
   const [hasListing, setHasListing] = useState(true);
-  
+
   // Mock listing data for the user's listing
   const userListing = {
     id: 999,
-    image: "https://images.unsplash.com/photo-1723468357904-22ea41bc4157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBiZWRyb29tJTIwc3R1ZGVudCUyMGhvdXNpbmd8ZW58MXx8fHwxNzU4OTY2NjI0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    image:
+      "https://images.unsplash.com/photo-1723468357904-22ea41bc4157?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBhcGFydG1lbnQlMjBiZWRyb29tJTIwc3R1ZGVudCUyMGhvdXNpbmd8ZW58MXx8fHwxNzU4OTY2NjI0fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     price: 850,
     address: "123 Main St, Blacksburg",
     beds: 3,
     baths: 2,
     matchScore: undefined, // Don't show match score for own listing
-    isPrivate: true
+    isPrivate: true,
   };
 
   const handleEditListing = () => {
@@ -55,19 +56,19 @@ export function MyListingPage() {
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Home className="w-10 h-10 text-primary" />
             </div>
-            
+
             <h1 className="font-heading mb-4">
               Find the perfect roommate for your place.
             </h1>
-            
-            <Button 
+
+            <Button
               onClick={handleCreateListing}
               className="gradient-primary hover:opacity-90 text-white rounded-xl px-8 py-3 shadow-lg"
             >
               + Create Your Listing
             </Button>
           </div>
-          
+
           {/* Demo toggle */}
           <div className="flex justify-center mt-8">
             <button
@@ -88,7 +89,9 @@ export function MyListingPage() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="font-heading">Manage Your Listing</h1>
-          <p className="text-subtle">Edit your listing details and track performance</p>
+          <p className="text-subtle">
+            Edit your listing details and track performance
+          </p>
         </div>
 
         <div className="max-w-2xl space-y-8">
@@ -106,24 +109,24 @@ export function MyListingPage() {
               isLoggedIn={true}
               onInterested={handleInterested}
             />
-            
+
             {/* Management Buttons */}
             <div className="space-y-3">
-              <Button 
+              <Button
                 onClick={handleEditListing}
                 className="w-full gradient-primary hover:opacity-90 text-white rounded-xl py-3 shadow-lg"
               >
                 Edit Listing
               </Button>
-              
-              <Button 
+
+              <Button
                 onClick={handleDuplicateListing}
                 variant="outline"
                 className="w-full border-white/20 text-gray-700 hover:bg-white/50 rounded-xl py-3"
               >
                 Duplicate for Next Year
               </Button>
-              
+
               <button
                 onClick={handleDeactivateListing}
                 className="w-full flex items-center justify-center gap-2 text-subtle hover:text-red-600 transition-colors py-2"
@@ -137,7 +140,7 @@ export function MyListingPage() {
           {/* Listing Performance */}
           <ListingPerformance views={247} inquiries={12} />
         </div>
-        
+
         {/* Demo toggle */}
         <div className="flex justify-center mt-12">
           <button

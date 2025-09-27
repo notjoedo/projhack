@@ -1,30 +1,32 @@
 import { useState } from "react";
 import { Sidebar } from "./components/Sidebar";
-import { DashboardPage } from "./components/DashboardPage";
-import { InquiriesPage } from "./components/InquiriesPage";
-import { MyListingPage } from "./components/MyListingPage";
-import { ProfilePage } from "./components/ProfilePage";
-import { OnboardingPage } from "./components/OnboardingPage";
-import type { ProfileData } from "./components/OnboardingPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { InquiriesPage } from "./pages/InquiriesPage";
+import { MyListingPage } from "./pages/MyListingPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { OnboardingPage } from "./pages/OnboardingPage";
+import type { ProfileData } from "./pages/OnboardingPage";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'inquiries' | 'listing' | 'profile'>('dashboard');
+  const [currentPage, setCurrentPage] = useState<
+    "dashboard" | "inquiries" | "listing" | "profile"
+  >("dashboard");
   const [isOnboarded, setIsOnboarded] = useState(true); // Set to false for new users
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const handlePageChange = (page: 'dashboard' | 'inquiries' | 'listing') => {
+  const handlePageChange = (page: "dashboard" | "inquiries" | "listing") => {
     setCurrentPage(page);
   };
 
   const handleProfileClick = () => {
-    setCurrentPage('profile');
+    setCurrentPage("profile");
   };
 
   const handleOnboardingComplete = (profileData: ProfileData) => {
     // In a real app, save the profile data to your backend/state management
-    console.log('Onboarding completed with data:', profileData);
+    console.log("Onboarding completed with data:", profileData);
     setIsOnboarded(true);
-    setCurrentPage('dashboard');
+    setCurrentPage("dashboard");
   };
 
   const handleToggleSidebar = () => {
@@ -33,13 +35,13 @@ export default function App() {
 
   const renderCurrentPage = () => {
     switch (currentPage) {
-      case 'dashboard':
+      case "dashboard":
         return <DashboardPage />;
-      case 'inquiries':
+      case "inquiries":
         return <InquiriesPage />;
-      case 'listing':
+      case "listing":
         return <MyListingPage />;
-      case 'profile':
+      case "profile":
         return <ProfilePage />;
       default:
         return <DashboardPage />;
@@ -53,16 +55,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white flex">
-      <Sidebar 
-        currentPage={currentPage} 
-        onPageChange={handlePageChange} 
+      <Sidebar
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
         onProfileClick={handleProfileClick}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={handleToggleSidebar}
       />
-      <div className="flex-1">
-        {renderCurrentPage()}
-      </div>
+      <div className="flex-1">{renderCurrentPage()}</div>
     </div>
   );
 }

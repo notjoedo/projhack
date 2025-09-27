@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { ProfileHub } from "./profile-wizard/ProfileHub";
-import { EssentialsStep } from "./profile-wizard/EssentialsStep";
-import { DealBreakersStep } from "./profile-wizard/DealBreakersStep";
-import { LifestyleVibeStep } from "./profile-wizard/LifestyleVibeStep";
-import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
+import { ProfileHub } from "../components/profile-wizard/ProfileHub";
+import { EssentialsStep } from "../components/profile-wizard/EssentialsStep";
+import { DealBreakersStep } from "../components/profile-wizard/DealBreakersStep";
+import { LifestyleVibeStep } from "../components/profile-wizard/LifestyleVibeStep";
+import { Button } from "../components/ui/button";
+import { Progress } from "../components/ui/progress";
 
 export interface ProfileData {
   // Essentials
@@ -14,14 +14,14 @@ export interface ProfileData {
   budget: [number, number];
   roomType: string;
   moveInDate: string;
-  
+
   // Deal-Breakers
   petFriendly: boolean | null;
   smokingAllowed: boolean | null;
   genderPreference: string | null;
   partiesOk: boolean | null;
   guestsOk: boolean | null;
-  
+
   // Lifestyle Vibe
   cleanliness: number;
   socialLevel: number;
@@ -30,20 +30,20 @@ export interface ProfileData {
 }
 
 export function ProfilePage() {
-  const [view, setView] = useState<'hub' | 'edit'>('hub');
+  const [view, setView] = useState<"hub" | "edit">("hub");
   const [editStep, setEditStep] = useState(1);
-  
+
   // Mock profile data - in a real app this would come from user state/API
   const [profileData, setProfileData] = useState<ProfileData>({
-    name: 'Sarah Johnson',
-    university: 'University of California, Berkeley',
-    graduationYear: '2026',
+    name: "Sarah Johnson",
+    university: "University of California, Berkeley",
+    graduationYear: "2026",
     budget: [800, 1400],
-    roomType: 'private',
-    moveInDate: '2024-08-15',
+    roomType: "private",
+    moveInDate: "2024-08-15",
     petFriendly: false,
     smokingAllowed: false,
-    genderPreference: 'same',
+    genderPreference: "same",
     partiesOk: null,
     guestsOk: true,
     cleanliness: 75,
@@ -53,23 +53,23 @@ export function ProfilePage() {
   });
 
   const updateProfileData = (updates: Partial<ProfileData>) => {
-    setProfileData(prev => ({ ...prev, ...updates }));
+    setProfileData((prev) => ({ ...prev, ...updates }));
   };
 
   const handleEditSection = (step: number) => {
     setEditStep(step);
-    setView('edit');
+    setView("edit");
   };
 
   const handleSaveEdit = () => {
-    setView('hub');
+    setView("hub");
   };
 
   const handleCancelEdit = () => {
-    setView('hub');
+    setView("hub");
   };
 
-  if (view === 'edit') {
+  if (view === "edit") {
     return (
       <div className="flex-1 p-8 bg-white">
         <div className="max-w-2xl mx-auto">
@@ -95,19 +95,19 @@ export function ProfilePage() {
           {/* Edit Steps */}
           <div className="min-h-[500px]">
             {editStep === 1 && (
-              <EssentialsStep 
+              <EssentialsStep
                 profileData={profileData}
                 onUpdate={updateProfileData}
               />
             )}
             {editStep === 2 && (
-              <DealBreakersStep 
+              <DealBreakersStep
                 profileData={profileData}
                 onUpdate={updateProfileData}
               />
             )}
             {editStep === 3 && (
-              <LifestyleVibeStep 
+              <LifestyleVibeStep
                 profileData={profileData}
                 onUpdate={updateProfileData}
               />
@@ -129,9 +129,6 @@ export function ProfilePage() {
   }
 
   return (
-    <ProfileHub 
-      profileData={profileData} 
-      onEditSection={handleEditSection}
-    />
+    <ProfileHub profileData={profileData} onEditSection={handleEditSection} />
   );
 }

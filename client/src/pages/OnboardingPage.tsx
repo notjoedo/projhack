@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
-import { EssentialsStep } from "./profile-wizard/EssentialsStep";
-import { DealBreakersStep } from "./profile-wizard/DealBreakersStep";
-import { LifestyleVibeStep } from "./profile-wizard/LifestyleVibeStep";
+import { Button } from "../components/ui/button";
+import { Progress } from "../components/ui/progress";
+import { EssentialsStep } from "../components/profile-wizard/EssentialsStep";
+import { DealBreakersStep } from "../components/profile-wizard/DealBreakersStep";
+import { LifestyleVibeStep } from "../components/profile-wizard/LifestyleVibeStep";
 
 export interface ProfileData {
   // Essentials
@@ -13,14 +13,14 @@ export interface ProfileData {
   budget: [number, number];
   roomType: string;
   moveInDate: string;
-  
+
   // Deal-Breakers
   petFriendly: boolean | null;
   smokingAllowed: boolean | null;
   genderPreference: string | null;
   partiesOk: boolean | null;
   guestsOk: boolean | null;
-  
+
   // Lifestyle Vibe
   cleanliness: number;
   socialLevel: number;
@@ -35,12 +35,12 @@ interface OnboardingPageProps {
 export function OnboardingPage({ onComplete }: OnboardingPageProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [profileData, setProfileData] = useState<ProfileData>({
-    name: '',
-    university: '',
-    graduationYear: '',
+    name: "",
+    university: "",
+    graduationYear: "",
     budget: [600, 1200],
-    roomType: '',
-    moveInDate: '',
+    roomType: "",
+    moveInDate: "",
     petFriendly: null,
     smokingAllowed: null,
     genderPreference: null,
@@ -53,7 +53,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
   });
 
   const updateProfileData = (updates: Partial<ProfileData>) => {
-    setProfileData(prev => ({ ...prev, ...updates }));
+    setProfileData((prev) => ({ ...prev, ...updates }));
   };
 
   const handleNext = () => {
@@ -79,12 +79,8 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
         <div className="mb-8 text-center">
           <h1 className="font-heading mb-4">Welcome to HouseAI!</h1>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-subtle">
-              Let's set up your housing preferences
-            </p>
-            <div className="text-subtle">
-              Step {currentStep} of 3
-            </div>
+            <p className="text-subtle">Let's set up your housing preferences</p>
+            <div className="text-subtle">Step {currentStep} of 3</div>
           </div>
           <Progress value={getProgress()} className="h-2 mb-2" />
           <p className="text-subtle">
@@ -97,19 +93,19 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
         {/* Wizard Steps */}
         <div className="min-h-[500px]">
           {currentStep === 1 && (
-            <EssentialsStep 
+            <EssentialsStep
               profileData={profileData}
               onUpdate={updateProfileData}
             />
           )}
           {currentStep === 2 && (
-            <DealBreakersStep 
+            <DealBreakersStep
               profileData={profileData}
               onUpdate={updateProfileData}
             />
           )}
           {currentStep === 3 && (
-            <LifestyleVibeStep 
+            <LifestyleVibeStep
               profileData={profileData}
               onUpdate={updateProfileData}
             />
@@ -130,7 +126,7 @@ export function OnboardingPage({ onComplete }: OnboardingPageProps) {
             onClick={handleNext}
             className="gradient-primary hover:opacity-90 text-white rounded-xl px-8 shadow-lg"
           >
-            {currentStep === 3 ? 'Complete Setup' : 'Next'}
+            {currentStep === 3 ? "Complete Setup" : "Next"}
           </Button>
         </div>
       </div>
