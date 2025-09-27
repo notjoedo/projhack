@@ -2,19 +2,19 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from .config import DATABASE_URL
 
-# Create engine
+# Create engine first
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
-# Register pgvector adapter for psycopg (so we can pass Python lists as vectors)
+# Register pgvector adapter for psycopg connections
 try:
     from pgvector.psycopg import register_vector
+
     @event.listens_for(engine, "connect")
     def _on_connect(dbapi_connection, connection_record):
         try:
             register_vector(dbapi_connection)
         except Exception:
-            # fine on SQLite or if already registered
-            pass
+            pass  # ok on SQLite or if already registered
 except Exception:
     pass
 

@@ -2,13 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .db import Base, engine
 from . import models
-from .routers import match, explain, interest
-
+from .routers import match, explain, interest, listings
 # Create tables if they don’t exist
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Blacksburg Housing Agent API")
-
+app.include_router(listings.router, tags=["listings"]) 
 # Allow frontend requests
 app.add_middleware(
     CORSMiddleware,

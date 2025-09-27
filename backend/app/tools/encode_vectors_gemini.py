@@ -5,7 +5,7 @@ from ..models import Listing
 from ..gemini_client import embed_text
 import json
 from time import sleep
-# python -m app.tools.encode_vectors_gemini
+
 def build_text(l: Listing) -> str:
     am = (l.amenities or [])
     parts = [
@@ -15,10 +15,7 @@ def build_text(l: Listing) -> str:
         f"Beds: {l.bedrooms} Baths: {l.bathrooms}",
     ]
     return ". ".join([p for p in parts if p]).strip()
-'''SELECT id, vector_dims(vector_desc) AS dims
-FROM public.listings
-WHERE vector_desc IS NOT NULL
-LIMIT 1;'''
+
 def main():
     db: Session = SessionLocal()
     rows = db.execute(text("""
