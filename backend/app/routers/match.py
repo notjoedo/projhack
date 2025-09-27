@@ -1,84 +1,80 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import text
 from typing import List, Dict, Any
-import math
-
+import numpy as np
 from ..db import get_db
-from ..models import Listing
-
+from ..gemini_client import embed_text
+from ..scorer import jaccard, weighted_score, score_factors, mmr
+#python -m uvicorn app.main:app --reload --port 8006
 router = APIRouter()
-
-def exp_closeness(delta: float, alpha: float) -> float:
-    """Higher when price is close to budget mid (alpha≈300 spreads the curve)."""
-    return math.exp(-abs(delta)/alpha)
-
-def jaccard(a: List[str], b: List[str]) -> float:
-    sa, sb = set(a or []), set(b or [])
-    if not sa and not sb:
-        return 0.5
-    inter = len(sa & sb)
-    union = len(sa | sb)
-    return inter/union if union else 0.0
-
-def score_listing(row, prefs: Dict[str, Any]) -> Dict[str, float]:
-    # Budget closeness
-    budget_min = prefs.get("budget_min")
-    budget_max = prefs.get("budget_max")
-    budget_mid = None
-    if budget_min is not None and budget_max is not None:
-        budget_mid = 0.5*(float(budget_min)+float(budget_max))
-    price = exp_closeness((row.price - (budget_mid or row.price)), alpha=300.0)
-
-    # Distance (decay by miles); we seeded 0.3–2.5
-    distance = math.exp(- (row.distance_miles or 0.0) / 1.0) if row.distance_miles is not None else 0.5
-
-    # Amenities overlap
-    pref_amen = prefs.get("amenities") or []
-    amenities = row.amenities or []
-    amenities_score = jaccard(pref_amen, amenities)
-
-    # Semantic & freshness placeholders for now
-    semantic = 0.6
-    freshness = 0.8
-
-    # Area = mean of safety & walk if present
-    area_vals = []
-    if row.safety_score is not None: area_vals.append(row.safety_score/100.0)
-    if row.walk_score is not None: area_vals.append(row.walk_score/100.0)
-    area = sum(area_vals)/len(area_vals) if area_vals else 0.5
-
-    return {
-        "price": price, "distance": distance, "amenities": amenities_score,
-        "semantic": semantic, "area": area, "freshness": freshness
-    }
-
-def weighted_score(factors: Dict[str, float]) -> float:
-    w = {"price":0.18,"distance":0.16,"amenities":0.12,"semantic":0.30,"freshness":0.12,"area":0.12}
-    return 100.0 * sum(w[k]*factors[k] for k in w)
-
+'''curl -X POST http://localhost:8006/match \
+  -H "Content-Type: application/json" \
+  -d '{"query":"quiet, pet friendly, close to campus gym","prefs":{"budget_min":650,"budget_max":950,"amenities":["Fitness Center","Dog Park"]},"topn":5}''''
 @router.post("/match")
 def match(body: Dict[str, Any] = None, db: Session = Depends(get_db)):
     body = body or {}
     prefs = body.get("prefs") or {}
     topn = int(body.get("topn") or 10)
+    query_text = (body.get("query") or "").strip()
 
-    # Pull available listings
-    rows = db.execute(
-        select(Listing).where(Listing.availability_status == "available")
-    ).scalars().all()
+    if not query_text:
+        # If no query, still return decent defaults (no vector bias)
+        query_text = "student housing near Virginia Tech, affordable, quiet, safe"
 
-    scored = []
+    # 1) Embed the user's query (768 dims)
+    try:
+        user_vec = embed_text(query_text)
+    except Exception as e:
+        raise HTTPException(500, f"Embedding failed: {e}")
+
+    # 2) Retrieve top-K by vector similarity (cosine)
+    TOPK = 120
+    rows = db.execute(text(f"""
+        SELECT id, property_name, price, distance_miles, amenities, safety_score, walk_score, vector_desc
+        FROM public.listings
+        WHERE availability_status = 'available' AND vector_desc IS NOT NULL
+        ORDER BY vector_desc <=> :uvec
+        LIMIT :k
+    """), {"uvec": user_vec, "k": TOPK}).fetchall()
+
+    # 3) Score & diversify
+    candidates = []
+    bmin, bmax = prefs.get("budget_min"), prefs.get("budget_max")
+    budget_mid = 0.5*(float(bmin)+float(bmax)) if bmin is not None and bmax is not None else None
+    pref_amen = prefs.get("amenities") or []
+
     for r in rows:
-        f = score_listing(r, prefs)
-        s = weighted_score(f)
-        scored.append({
+        class Obj: pass
+        o = Obj()
+        o.price = r.price
+        o.distance_miles = r.distance_miles
+        o.safety_score = r.safety_score
+        o.walk_score = r.walk_score
+
+        factors = score_factors(o, user_budget_mid=budget_mid,
+                                user_vec=np.array(user_vec, dtype=float),
+                                list_vec=np.array(r.vector_desc or np.zeros(len(user_vec))))
+        factors["amenities"] = jaccard(pref_amen, r.amenities or [])
+        score = weighted_score(factors)
+
+        candidates.append({
             "listing_id": r.id,
-            "score": round(s,2),
-            "factors": {k: round(v,3) for k,v in f.items()},
-            "summary_stub": f"Price fit {f['price']:.2f}, distance {f['distance']:.2f}."
+            "vec": np.array(r.vector_desc or np.zeros(len(user_vec))),
+            "score": score,
+            "factors": factors,
+            "summary_stub": f"Price fit {factors['price']:.2f}, distance {factors['distance']:.2f}."
         })
 
-    # simple sort by score (we’ll add MMR later)
-    scored.sort(key=lambda x: x["score"], reverse=True)
-    return scored[:topn]
+    ranked = mmr(candidates, topn=topn)
+
+    # 4) Serialize
+    out = []
+    for c in ranked:
+        out.append({
+            "listing_id": c["listing_id"],
+            "score": round(c["score"], 2),
+            "factors": {k: round(v, 3) for k, v in c["factors"].items()},
+            "summary_stub": c["summary_stub"]
+        })
+    return out
