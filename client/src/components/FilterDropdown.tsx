@@ -1,3 +1,6 @@
+import { useState } from "react";
+import Slider from "@mui/material/Slider";
+import { styled } from "@mui/material/styles";
 import {
   FiWifi,
   FiCoffee,
@@ -16,6 +19,45 @@ type FilterDropdownProps = {
   onClose: () => void;
   onClear: () => void;
 };
+
+const PrettoSlider = styled(Slider)({
+  color: "#6b1f88",
+  height: 8,
+  "& .MuiSlider-track": {
+    border: "none",
+  },
+  "& .MuiSlider-thumb": {
+    height: 24,
+    width: 24,
+    backgroundColor: "#fff",
+    border: "2px solid currentColor",
+    "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+      boxShadow: "inherit",
+    },
+    "&:before": {
+      display: "none",
+    },
+  },
+  "& .MuiSlider-valueLabel": {
+    lineHeight: 1.2,
+    fontSize: 12,
+    background: "unset",
+    padding: 0,
+    width: 32,
+    height: 32,
+    borderRadius: "50% 50% 50% 0",
+    backgroundColor: "#6b1f88",
+    transformOrigin: "bottom left",
+    transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
+    "&:before": { display: "none" },
+    "&.MuiSlider-valueLabelOpen": {
+      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
+    },
+    "& > *": {
+      transform: "rotate(45deg)",
+    },
+  },
+});
 
 const FilterDropdown = ({
   filters,
@@ -37,6 +79,10 @@ const FilterDropdown = ({
       ? filters.amenities.filter((a: string) => a !== amenity)
       : [...filters.amenities, amenity];
     onFilterChange({ ...filters, amenities: newAmenities });
+  };
+
+  const handlePriceChange = (_event: Event, newValue: number | number[]) => {
+    onFilterChange({ ...filters, priceRange: newValue as number[] });
   };
 
   const handleBedsChange = (bedOption: string) => {
@@ -64,6 +110,23 @@ const FilterDropdown = ({
           >
             <span />
           </button>
+        </div>
+      </div>
+
+      <div className="filter-section">
+        <h5>Price Range</h5>
+        <div className="price-range-slider">
+          <PrettoSlider
+            value={filters.priceRange}
+            onChange={handlePriceChange}
+            min={0}
+            max={2000}
+            disableSwap
+          />
+          <div className="range-labels">
+            <span>${filters.priceRange[0]}</span>
+            <span>${filters.priceRange[1]}</span>
+          </div>
         </div>
       </div>
 

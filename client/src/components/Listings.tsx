@@ -1,12 +1,13 @@
 import { useState, useRef } from "react";
 import { FiHeart, FiFilter, FiChevronDown } from "react-icons/fi";
-import { FaSort } from "react-icons/fa";
+import { FaSort, FaHeart } from "react-icons/fa";
 import SortDropdown from "./SortDropdown";
 import FilterDropdown from "./FilterDropdown";
 import useOnClickOutside from "../hooks/useOnClickOutside";
 import "./Listings.css";
 
 const Listings = () => {
+  const [isFavorited, setIsFavorited] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortOptions = [
     "Best Match",
@@ -64,8 +65,11 @@ const Listings = () => {
       <div className="listings-header">
         <h2>Showing 4 of 124 listings</h2>
         <div className="listings-actions">
-          <button className="btn-icon">
-            <FiHeart />
+          <button
+            className="btn-icon"
+            onClick={() => setIsFavorited(!isFavorited)}
+          >
+            {isFavorited ? <FaHeart /> : <FiHeart />}
           </button>
           <div className="filter-container" ref={filterRef}>
             <button

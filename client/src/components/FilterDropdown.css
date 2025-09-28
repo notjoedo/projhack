@@ -80,6 +80,18 @@
   transform: translateX(14px);
 }
 
+.price-range-slider {
+  padding: 8px;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #4a5565;
+}
+
 .filter-section h5 {
   font-size: 16px;
   font-weight: 500;
