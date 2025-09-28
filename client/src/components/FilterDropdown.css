@@ -123,6 +123,37 @@
   color: #ffffff;
 }
 
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.amenity-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border: 1px solid rgba(202, 175, 197, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #364153;
+  text-align: left;
+}
+
+.amenity-btn.active {
+  background: rgba(202, 175, 197, 0.2);
+  border-color: rgba(202, 175, 197, 0.3);
+  color: #6b1f88;
+}
+
+.amenity-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .filter-actions {
   display: flex;
   gap: 12px;
@@ -140,6 +171,12 @@
   font-weight: 500;
   font-size: 16px;
   cursor: pointer;
+  background-size: 200% auto;
+  transition: background-position 0.5s ease;
+}
+
+.filter-actions .btn-primary:hover {
+  background-position: right center;
 }
 
 .filter-actions .btn-secondary {

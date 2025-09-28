@@ -18,13 +18,14 @@ const Listings = () => {
   const [selectedSort, setSelectedSort] = useState<string | null>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filters, setFilters] = useState({
+  const initialFilterState = {
     useSaved: false,
     priceRange: [400, 1200],
-    beds: "Any",
-    baths: "Any",
-    amenities: ["In-Unit Laundry", "Parking"],
-  });
+    beds: null,
+    baths: null,
+    amenities: [],
+  };
+  const [filters, setFilters] = useState(initialFilterState);
 
   const sortRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
@@ -37,8 +38,12 @@ const Listings = () => {
     setIsSortOpen(false);
   };
 
-  const handleFilterApply = (newFilters: any) => {
+  const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
+  };
+
+  const handleFilterClear = () => {
+    setFilters(initialFilterState);
   };
 
   const getFilterCount = () => {
@@ -46,8 +51,8 @@ const Listings = () => {
     if (filters.useSaved) count++;
     if (filters.priceRange[0] !== 400 || filters.priceRange[1] !== 1200)
       count++;
-    if (filters.beds !== "Any") count++;
-    if (filters.baths !== "Any") count++;
+    if (filters.beds) count++;
+    if (filters.baths) count++;
     count += filters.amenities.length;
     return count;
   };
@@ -74,9 +79,10 @@ const Listings = () => {
             </button>
             {isFilterOpen && (
               <FilterDropdown
-                initialFilters={filters}
-                onApply={handleFilterApply}
+                filters={filters}
+                onFilterChange={handleFilterChange}
                 onClose={() => setIsFilterOpen(false)}
+                onClear={handleFilterClear}
               />
             )}
           </div>

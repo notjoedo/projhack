@@ -1,35 +1,50 @@
-import { useState } from "react";
+import {
+  FiWifi,
+  FiCoffee,
+  FiZap,
+  FiWind,
+  FiSun,
+  FiDroplet,
+} from "react-icons/fi";
+import { FaParking, FaDumbbell } from "react-icons/fa";
+import { CgSmartHomeWashMachine } from "react-icons/cg";
 import "./FilterDropdown.css";
 
 type FilterDropdownProps = {
-  initialFilters: any;
-  onApply: (filters: any) => void;
+  filters: any;
+  onFilterChange: (filters: any) => void;
   onClose: () => void;
+  onClear: () => void;
 };
 
 const FilterDropdown = ({
-  initialFilters,
-  onApply,
+  filters,
+  onFilterChange,
   onClose,
+  onClear,
 }: FilterDropdownProps) => {
-  const [filters, setFilters] = useState(initialFilters);
+  const amenities = [
+    { name: "In-Unit Laundry", icon: <CgSmartHomeWashMachine /> },
+    { name: "Parking", icon: <FaParking /> },
+    { name: "Gym", icon: <FaDumbbell /> },
+    { name: "Wifi", icon: <FiWifi /> },
+    { name: "Coffee Bar", icon: <FiCoffee /> },
+    { name: "Utilities", icon: <FiZap /> },
+  ];
 
-  const handleApply = () => {
-    onApply(filters);
-    onClose();
+  const handleAmenityToggle = (amenity: string) => {
+    const newAmenities = filters.amenities.includes(amenity)
+      ? filters.amenities.filter((a: string) => a !== amenity)
+      : [...filters.amenities, amenity];
+    onFilterChange({ ...filters, amenities: newAmenities });
   };
 
-  const handleClear = () => {
-    const clearedFilters = {
-      useSaved: false,
-      priceRange: [400, 1200],
-      beds: "Any",
-      baths: "Any",
-      amenities: [],
-    };
-    setFilters(clearedFilters);
-    onApply(clearedFilters);
-    onClose();
+  const handleBedsChange = (bedOption: string) => {
+    onFilterChange({ ...filters, beds: bedOption });
+  };
+
+  const handleBathsChange = (bathOption: string) => {
+    onFilterChange({ ...filters, baths: bathOption });
   };
 
   return (
@@ -44,20 +59,11 @@ const FilterDropdown = ({
           <button
             className={`toggle-btn ${filters.useSaved ? "active" : ""}`}
             onClick={() =>
-              setFilters({ ...filters, useSaved: !filters.useSaved })
+              onFilterChange({ ...filters, useSaved: !filters.useSaved })
             }
           >
             <span />
           </button>
-        </div>
-      </div>
-
-      <div className="filter-section">
-        <h5>Price Range</h5>
-        {/* Placeholder for price range slider */}
-        <div className="price-range-placeholder">
-          <span>${filters.priceRange[0]}</span>
-          <span>${filters.priceRange[1]}</span>
         </div>
       </div>
 
@@ -71,7 +77,9 @@ const FilterDropdown = ({
                 <button
                   key={o}
                   className={filters.beds === o ? "active" : ""}
-                  onClick={() => setFilters({ ...filters, beds: o })}
+                  onClick={() =>
+                    handleBedsChange(filters.beds === o ? null : o)
+                  }
                 >
                   {o}
                 </button>
@@ -85,7 +93,9 @@ const FilterDropdown = ({
                 <button
                   key={o}
                   className={filters.baths === o ? "active" : ""}
-                  onClick={() => setFilters({ ...filters, baths: o })}
+                  onClick={() =>
+                    handleBathsChange(filters.baths === o ? null : o)
+                  }
                 >
                   {o}
                 </button>
@@ -97,14 +107,27 @@ const FilterDropdown = ({
 
       <div className="filter-section">
         <h5>Key Amenities</h5>
-        <div className="amenities-grid">{/* Placeholder for amenities */}</div>
+        <div className="amenities-grid">
+          {amenities.map((amenity) => (
+            <button
+              key={amenity.name}
+              className={`amenity-btn ${
+                filters.amenities.includes(amenity.name) ? "active" : ""
+              }`}
+              onClick={() => handleAmenityToggle(amenity.name)}
+            >
+              {amenity.icon}
+              <span>{amenity.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="filter-actions">
-        <button className="btn-primary" onClick={handleApply}>
+        <button className="btn-primary" onClick={onClose}>
           Apply Filters
         </button>
-        <button className="btn-secondary" onClick={handleClear}>
+        <button className="btn-secondary" onClick={onClear}>
           Clear All
         </button>
       </div>
