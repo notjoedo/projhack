@@ -23,8 +23,12 @@
 
 .listings-actions {
   display: flex;
-  align-items: center;
   gap: 12px;
+}
+
+.filter-wrapper,
+.sort-wrapper {
+  position: relative;
 }
 
 .listings-actions .btn-icon {
@@ -51,7 +55,7 @@
   padding: 4px 12px;
   gap: 8px;
   height: 34px;
-  background: #ffffff;
+  background-color: #ffffff;
   border: 1px solid rgba(202, 175, 197, 0.3);
   border-radius: 99999px;
   font-family: "Rubik", sans-serif;
@@ -75,6 +79,11 @@
   width: 16px;
   height: 16px;
   color: #6b1f88;
+}
+
+.listings-actions .filters-btn.active,
+.listings-actions .sort-btn.active {
+  background-color: #f3f4f6;
 }
 
 .sort-icon-placeholder {

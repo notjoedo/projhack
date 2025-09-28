@@ -1,5 +1,6 @@
 .filter-dropdown {
   position: absolute;
+  top: 100%;
   width: 420px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
