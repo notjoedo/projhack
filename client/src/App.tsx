@@ -1,7 +1,7 @@
 import "./App.css";
 import Sidebar from "./components/Sidebar";
 import SearchBar from "./components/SearchBar";
-import DashboardContent from "./components/DashboardContent";
+import Listings from "./components/Listings";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         <header className="main-header">
           <SearchBar />
         </header>
-        <DashboardContent />
+        <Listings />
       </main>
     </div>
   );

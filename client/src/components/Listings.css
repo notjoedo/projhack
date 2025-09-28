@@ -1,4 +1,4 @@
-.dashboard-content {
+.listings-container {
   background: #ffffff;
   border: 1px solid #f3f4f6;
   border-radius: 14px;
@@ -80,4 +80,12 @@
 .sort-icon-placeholder {
   width: 16px;
   height: 16px;
+}
+
+.sort-container {
+  position: relative;
+}
+
+.filter-container {
+  position: relative;
 }

@@ -1,0 +1,154 @@
+.filter-dropdown {
+  position: absolute;
+  width: 420px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  z-index: 10;
+  margin-top: 8px;
+  right: 0;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-section h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e2939;
+  margin: 0;
+}
+
+.saved-preferences {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(202, 175, 197, 0.2);
+  border-radius: 10px;
+}
+
+.saved-preferences h5 {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e2939;
+  margin: 0;
+}
+
+.saved-preferences p {
+  font-size: 12px;
+  color: #4a5565;
+  margin: 0;
+}
+
+.toggle-btn {
+  width: 32px;
+  height: 18px;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.toggle-btn.active {
+  background: #6b1f88;
+}
+
+.toggle-btn span {
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.2s;
+}
+
+.toggle-btn.active span {
+  transform: translateX(14px);
+}
+
+.filter-section h5 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1e2939;
+  margin: 0;
+}
+
+.beds-baths-container {
+  display: flex;
+  gap: 20px;
+}
+
+.beds-baths-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.beds-baths-selector p {
+  font-size: 14px;
+  color: #4a5565;
+  margin: 0;
+}
+
+.beds-baths-selector .options {
+  display: flex;
+  gap: 8px;
+}
+
+.beds-baths-selector .options button {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #f3f4f6;
+  color: #364153;
+  cursor: pointer;
+}
+
+.beds-baths-selector .options button.active {
+  background: #6b1f88;
+  color: #ffffff;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.filter-actions .btn-primary {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #6b1f88 0%, #a772bb 50.48%, #6b1f88 100%);
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.filter-actions .btn-secondary {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #364153;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
