@@ -1,0 +1,17 @@
+# Housing Matcher API (≥70% only)
+
+## Run
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+## Endpoint
+POST /api/match
+Body:
+{
+  "query": "quiet, pet friendly, close to campus gym",
+  "prefs": { "budget_min": 800, "budget_max": 1000, "amenities": ["Fitness Center","Dog Park"] },
+  "topn": 6,
+  "use_vectors": true
+}
+
+Returns items with compatibility >= 70%, sorted best→worst, each with a one-line rationale.
