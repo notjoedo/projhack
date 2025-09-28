@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Find Housing Matches</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Load your local CSS from the /ui mount -->
+  <link rel="stylesheet" href="/ui/style.css" />
+
+  <!-- Leaflet (for the map modal) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Use same-origin so no hardcoded port needed -->
+  <script>
+    window.API_BASE = window.location.origin;
+  </script>
+
+  <!-- Load your app JS from the /ui mount -->
+  <script defer src="/ui/app.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="avatar">H</div>
+      <div class="brand-name">Harbor</div>
+    </div>
+    <nav class="nav">
+      <a class="nav-item active">Dashboard</a>
+      <a class="nav-item">Inquiries & Groups</a>
+      <a class="nav-item">My Listings</a>
+      <div class="spacer"></div>
+      <a class="nav-item">Notifications</a>
+      <a class="nav-item">Settings</a>
+      <a class="nav-item">Support</a>
+    </nav>
+    <div class="signin">Sign In</div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="search-wrap">
+        <form id="searchForm" class="search-form">
+          <input id="query" type="text" placeholder="Ask me to find your perfect home…" required />
+          <input id="budgetMin" type="number" min="0" placeholder="Budget min" />
+          <input id="budgetMax" type="number" min="0" placeholder="Budget max" />
+          <button id="searchBtn" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="toolbar">
+        <button class="chip" type="button">Filters (0)</button>
+        <button class="chip" type="button">Sort</button>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div id="status">Type a prompt and click Search.</div>
+    </section>
+
+    <section id="results" class="grid"></section>
+  </main>
+
+  <!-- Map Modal -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-content">
+      <button id="closeModal" class="close" aria-label="Close map">×</button>
+      <h3 id="modalTitle" class="modal-title">Location</h3>
+      <div id="compat" class="compat"></div>
+      <div id="map" class="map" role="region" aria-label="Listing approximate location"></div>
+    </div>
+  </div>
+</body>
+</html>
