@@ -53,3 +53,6 @@ dev.db
 .ipynb_checkpoints
 
 .config/
+package-lock.json
+client/package-lock.json
+client/package-lock.json
