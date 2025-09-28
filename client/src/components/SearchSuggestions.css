@@ -1,0 +1,82 @@
+.search-suggestions {
+  position: absolute;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 8px;
+  z-index: 100;
+}
+
+.suggestions-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestions-section {
+  margin-bottom: 16px;
+}
+
+.suggestions-section:last-child {
+  margin-bottom: 0;
+}
+
+.suggestions-section h4 {
+  font-family: "Rubik", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #4a5565;
+  margin: 0 0 12px 0;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+  background-color: #f3f4f6;
+}
+
+.suggestion-item.ai-suggestion:hover,
+.suggestion-item.ai-suggestion.active {
+  background-image: linear-gradient(
+    90deg,
+    rgba(239, 246, 255, 0.7) 0%,
+    rgba(250, 245, 255, 0.7) 100%
+  );
+}
+
+.suggestion-item.ai-suggestion svg {
+  color: #2563eb;
+}
+
+.suggestion-item.ai-suggestion:hover svg {
+  color: #8b5cf6;
+}
+
+.suggestion-item svg {
+  width: 16px;
+  height: 16px;
+  color: #99a1af;
+  flex-shrink: 0;
+}
+
+.suggestion-item span {
+  font-family: "Rubik", sans-serif;
+  font-size: 16px;
+  color: #4a5565;
+}

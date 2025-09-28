@@ -48,7 +48,7 @@ const Sidebar = () => {
           </button>
           <div className="sidebar-header">
             <div className="logo">H</div>
-            <h1>Hokie Home</h1>
+            <h1>Harbor</h1>
           </div>
           <nav className="sidebar-nav">
             <ul>
