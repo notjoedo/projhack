@@ -89,8 +89,12 @@ def _coord_near_campus(listing_id: Any):
     dlng = (((h >> 5) % 121) - 60) / 1000.0
     return VT_LAT + dlat, VT_LNG + dlng
 
+# ---------- Prompt-driven heatmap topic ----------
 def _prompt_to_heatmap_topic(text: str, default: str = "price") -> str:
-    """Very light NLP; swap to Gemini later if you like."""
+    """
+    Map user's free text to a heatmap topic. You can later replace with a Gemini
+    classifier, but this lightweight heuristic works well for now.
+    """
     t = (text or "").lower()
     if any(k in t for k in ["safe", "safety", "crime", "secure"]):
         return "safety"
@@ -98,7 +102,7 @@ def _prompt_to_heatmap_topic(text: str, default: str = "price") -> str:
         return "price"
     if any(k in t for k in ["fit", "match", "compat", "best"]):
         return "compat"
-    if any(k in t for k in ["busy", "populated", "dense", "crowd"]):
+    if any(k in t for k in ["busy", "populated", "dense", "crowd", "popular"]):
         return "count"
     return default
 
@@ -113,10 +117,11 @@ def _h3_aggregate(results: List[Dict[str, Any]], topic: str, res: int = 8) -> Li
     if not results:
         return []
 
+    from collections import defaultdict
     buckets = defaultdict(lambda: {"sum_price": 0.0, "sum_safety": 0.0, "max_compat": 0, "count": 0})
     centroids = {}
 
-    # First pass: drop points in hex buckets
+    # Drop points into hex buckets
     for it in results:
         lat, lng = _coord_near_campus(it["listing_id"])
         h = h3.geo_to_h3(lat, lng, res)
@@ -128,22 +133,21 @@ def _h3_aggregate(results: List[Dict[str, Any]], topic: str, res: int = 8) -> Li
             clat, clng = h3.h3_to_geo(h)
             centroids[h] = (clat, clng)
 
-    # Compute topic-specific weight baseline
+    # Topic values for min-max
     vals = []
-    for h, agg in buckets.items():
+    for _, agg in buckets.items():
         if topic == "price":
             vals.append(agg["sum_price"] / max(1, agg["count"]))
         elif topic == "safety":
             vals.append(agg["sum_safety"] / max(1, agg["count"]))
         elif topic == "compat":
             vals.append(agg["max_compat"])
-        else:  # count
+        else:
             vals.append(agg["count"])
 
     vmin, vmax = (min(vals), max(vals)) if vals else (0.0, 1.0)
     span = (vmax - vmin) if (vmax > vmin) else 1.0
 
-    # Build HexCell list with normalized weights (kept visible 0.25..1.0)
     hexes: List[HexCell] = []
     for h, agg in buckets.items():
         if topic == "price":
@@ -174,13 +178,12 @@ def _h3_aggregate(results: List[Dict[str, Any]], topic: str, res: int = 8) -> Li
 def match(req: MatchRequest, db: Session = Depends(get_db)):
     t0 = time.perf_counter()
     used_vectors = False
-    ranked = []
+    ranked: List[Dict[str, Any]] = []
 
-    # Pick heatmap topic from prompt if not explicitly set
-    topic = req.heatmap or _prompt_to_heatmap_topic(req.query, default="price")
+    topic = (req.heatmap or "").strip().lower() if req.heatmap else _prompt_to_heatmap_topic(req.query, default="price")
     h3_res = int(req.h3_res or 8)
 
-    # Vector path
+    # -------- Vector path (unchanged) --------
     if req.use_vectors:
         try:
             uvec = embed_text(req.query)
@@ -203,7 +206,7 @@ def match(req: MatchRequest, db: Session = Depends(get_db)):
             try: db.rollback()
             except Exception: pass
 
-    # Fast path
+    # -------- Fast path (unchanged) --------
     if not ranked:
         rows = db.execute(
             text("""
@@ -223,8 +226,8 @@ def match(req: MatchRequest, db: Session = Depends(get_db)):
     # Diverse displayed % mapping
     compat_map = _compatibility_percentages(ranked, low=55, high=96)
 
-    # Filter by cutoff; add rationale and compat %
-    filtered = []
+    # -------- Filter by cutoff; add rationale --------
+    filtered: List[Dict[str, Any]] = []
     for c in ranked:
         if c["score"] < config.COMPATIBILITY_CUTOFF:
             continue
@@ -237,8 +240,10 @@ def match(req: MatchRequest, db: Session = Depends(get_db)):
         if len(filtered) >= req.topn:
             break
 
-    # H3 aggregation over filtered set (only what user will see)
-    hexes = _h3_aggregate(filtered, topic=topic, res=h3_res)
+    # -------- H3 aggregation (NOW WITH FALLBACK) --------
+    # If nothing passed the cutoff, still build a heatmap from the top of 'ranked'
+    source_for_hex = filtered if filtered else ranked[: max(20, (req.topn or 10) * 3)]
+    hexes = _h3_aggregate(source_for_hex, topic=topic, res=h3_res)
 
     took_ms = int((time.perf_counter() - t0) * 1000)
     return MatchResponse(

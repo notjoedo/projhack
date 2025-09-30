@@ -1,74 +1,128 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Find Housing Matches</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <title>VT Housing • Heatmap & Matches</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <!-- Load your local CSS from the /ui mount -->
-  <link rel="stylesheet" href="/ui/style.css" />
+  <link rel="stylesheet" href="./style.css"/>
 
-  <!-- Leaflet (for the map modal) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root { --bg:#f6f7fb; --fg:#111827; --muted:#6b7280; --brand:#6d28d9; }
+    html, body { height:100%; margin:0; font:14px/1.4 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color:var(--fg); background:var(--bg); }
+    #app { position:fixed; inset:0; }
 
-  <!-- Use same-origin so no hardcoded port needed -->
-  <script>
-    window.API_BASE = window.location.origin;
-  </script>
+    .toolbar {
+      position: fixed; z-index: 20; top: 14px; left: 14px;
+      display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+      background: rgba(255,255,255,.95);
+      padding: 10px 12px; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+    .toolbar input, .toolbar select, .toolbar button {
+      border:1px solid #e5e7eb; border-radius:10px; padding:8px 12px; font-size:14px; background:#fff;
+    }
+    .toolbar button { background: var(--brand); color: #fff; border: none; }
+    .legend {
+      position: fixed; z-index: 20; bottom: 12px; left: 14px;
+      background: rgba(255,255,255,.95); padding: 8px 10px; border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    }
 
-  <!-- Load your app JS from the /ui mount -->
-  <script defer src="/ui/app.js"></script>
+    /* Results drawer */
+    .drawer {
+      position: fixed; top: 0; right: 0; bottom: 0; width: 520px; z-index: 25;
+      background: #fff; border-left: 1px solid #e5e7eb;
+      box-shadow: -10px 0 30px rgba(0,0,0,.12);
+      display:flex; flex-direction:column;
+    }
+    .drawer-header {
+      display:flex; gap:8px; align-items:center; padding:12px 14px; border-bottom:1px solid #f1f5f9;
+      position:sticky; top:0; background:#fff; z-index:1;
+    }
+    .drawer-title { font-weight:600; font-size:16px; }
+    .results { padding: 10px 14px 60px; overflow:auto; }
+    .card {
+      background:#fff; border:1px solid #eef0f4; border-radius:16px; padding:14px; margin: 10px 0; display:flex; gap:14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .img-skel {
+      width: 160px; height: 110px; border-radius:12px; background:linear-gradient(135deg,#eef2ff,#f1f5f9);
+      flex:0 0 160px;
+    }
+    .card-right { flex: 1; min-width: 0; }
+    .card-header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .card-title { margin:0; font-weight:700; font-size:18px; }
+    .compat-badge { background:#e9fdf3; color:#059669; font-weight:700; border-radius:999px; padding:4px 10px; }
+    .card-meta { display:flex; gap:12px; align-items:center; margin:6px 0; color:#374151; }
+    .price { font-weight:800; font-size:18px; }
+    .bullets { display:flex; flex-wrap:wrap; gap:6px; }
+    .bullet { font-size:12px; background:#f3f4f6; padding:4px 8px; border-radius:999px; color:#374151; }
+    .reason { margin:6px 0 10px; color:#374151; }
+    .card-actions { display:flex; gap:10px; }
+    .btn { padding:8px 12px; border-radius:10px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; }
+    .btn.primary { background: var(--brand); border-color: var(--brand); color:#fff; }
+
+    /* Contact modal */
+    .modal { position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index:99999; padding:16px; }
+    .modal .panel { background:#fff; max-width:640px; width:100%; border-radius:12px; padding:16px; box-shadow:0 20px 50px rgba(0,0,0,.25) }
+    .modal .row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .modal .h { margin:0; font:600 16px system-ui }
+    .modal .close { border:none;background:#eee;border-radius:6px;padding:4px 8px; cursor:pointer; }
+    .modal .status { color:#6b7280;margin-bottom:8px }
+    .modal textarea { width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;padding:8px }
+    .modal .actions { display:flex;gap:8px;margin-top:8px }
+  </style>
+
+  <!-- libs -->
+  <script src="https://unpkg.com/deck.gl@8.9.37/dist.min.js"></script>
+  <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="avatar">H</div>
-      <div class="brand-name">Harbor</div>
+  <div id="app"></div>
+
+  <div class="toolbar">
+    <input id="query" size="36" placeholder="e.g., quiet, pet friendly, close to campus gym"/>
+    <select id="topic">
+      <option value="">Auto (from prompt)</option>
+      <option value="price">Price</option>
+      <option value="safety">Safety</option>
+      <option value="compat">Compatibility</option>
+      <option value="count">Popularity</option>
+    </select>
+    <button id="run">Search</button>
+    <button id="toggleTop3">Toggle Top 3</button>
+  </div>
+
+  <div class="legend">Metric: <b id="metricName">price_avg</b> — darker = higher</div>
+
+  <!-- Results drawer -->
+  <aside class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div class="drawer-title">Matches</div>
+      <div id="status" style="margin-left:auto; color:#6b7280;">Type a prompt and click Search.</div>
     </div>
-    <nav class="nav">
-      <a class="nav-item active">Dashboard</a>
-      <a class="nav-item">Inquiries & Groups</a>
-      <a class="nav-item">My Listings</a>
-      <div class="spacer"></div>
-      <a class="nav-item">Notifications</a>
-      <a class="nav-item">Settings</a>
-      <a class="nav-item">Support</a>
-    </nav>
-    <div class="signin">Sign In</div>
+    <div id="results" class="results"></div>
   </aside>
 
-  <main class="content">
-    <header class="topbar">
-      <div class="search-wrap">
-        <form id="searchForm" class="search-form">
-          <input id="query" type="text" placeholder="Ask me to find your perfect home…" required />
-          <input id="budgetMin" type="number" min="0" placeholder="Budget min" />
-          <input id="budgetMax" type="number" min="0" placeholder="Budget max" />
-          <button id="searchBtn" type="submit">Search</button>
-        </form>
+  <!-- Contact modal is in DOM up front -->
+  <div id="contactModal" class="modal" aria-modal="true" role="dialog" aria-label="Message to the owner">
+    <div class="panel">
+      <div class="row">
+        <h3 class="h">Message to the owner</h3>
+        <button id="closeContact" class="close">×</button>
       </div>
-      <div class="toolbar">
-        <button class="chip" type="button">Filters (0)</button>
-        <button class="chip" type="button">Sort</button>
+      <div id="contactStatus" class="status">Generating…</div>
+      <textarea id="contactText" rows="8" placeholder="Your message will appear here…"></textarea>
+      <div class="actions">
+        <button id="btnCasual" class="btn">Make it casual</button>
+        <button id="btnShorter" class="btn">Make it shorter</button>
+        <button id="btnCopy" class="btn">Copy</button>
       </div>
-    </header>
-
-    <section class="summary">
-      <div id="status">Type a prompt and click Search.</div>
-    </section>
-
-    <section id="results" class="grid"></section>
-  </main>
-
-  <!-- Map Modal -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-content">
-      <button id="closeModal" class="close" aria-label="Close map">×</button>
-      <h3 id="modalTitle" class="modal-title">Location</h3>
-      <div id="compat" class="compat"></div>
-      <div id="map" class="map" role="region" aria-label="Listing approximate location"></div>
     </div>
   </div>
+
+  <!-- cache-busted to kill stale JS -->
+  <script src="./app.js?v=contact-wired-1"></script>
 </body>
 </html>
