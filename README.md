@@ -1,4 +1,4 @@
-# Harbor — AI Housing Compatibility Agent
+# Harbor — AI Housing Compatibility Agent | Virginia Tech Hacks 2025
 https://devpost.com/software/harbor-dc63ey
 
 An AI-powered housing compatibility agent for Virginia Tech students.  
