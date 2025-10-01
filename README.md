@@ -1,4 +1,4 @@
-# Harbor — AI Housing Compatibility Agent | Virginia Tech Hacks 2025
+# Harbor — AI Housing Compatibility Agent | VTHacks 13 - Virginia Tech Hackathon 2025
 https://devpost.com/software/harbor-dc63ey
 
 An AI-powered housing compatibility agent for Virginia Tech students.  
@@ -6,12 +6,12 @@ It blends **hybrid retrieval, geospatial intelligence, and LLM reasoning** to he
 
 ---
 
-## ✨ Inspiration
+## Inspiration
 Housing search is fragmented and stressful. Students don’t just need listings—they need **fit**: budget, safety, walkability, lifestyle, and compatibility with roommates.  
 
 ---
 
-## 🚀 What it does
+## What it does
 - **Search & Match** → Ranks listings by a compatibility score (0–100) using both structured filters and semantic embeddings.  
 - **Explainability** → Generates one-line rationales (“why this match”) for each result.  
 - **Heatmaps** → Displays H3-based visualizations (price, safety, compatibility, count) across Blacksburg.  
@@ -19,7 +19,7 @@ Housing search is fragmented and stressful. Students don’t just need listings�
 
 ---
 
-## 🛠 How we built it
+## How we built it
 - **Figma-first prototyping** → clear user flows and UI specs guided the entire stack.  
 - **Retrieval & Ranking** → Supabase Postgres with pgvector for hybrid search (SQL filters + kNN).  
 - **Scoring** → Budget, distance, safety, and walkability combined with MMR diversification.  
@@ -37,14 +37,14 @@ Housing search is fragmented and stressful. Students don’t just need listings�
 
 ---
 
-## ⚡ Challenges
+## Challenges
 - Balancing structured filters with semantic intent.  
 - Rendering responsive H3 heatmaps without heavy GIS overhead.  
 - Keeping Gemini outputs consistent and fast under hackathon constraints.  
 
 ---
 
-## 🏆 Accomplishments
+## Accomplishments
 - **End-to-end pipeline:** search → explain → visualize → contact.  
 - **Pixel-to-production fidelity:** translated Figma flows directly into the working UI.  
 - Databricks pipeline powering embeddings, geo features, and nightly refresh-ready data.  
@@ -52,7 +52,7 @@ Housing search is fragmented and stressful. Students don’t just need listings�
 
 ---
 
-## 📚 What we learned
+## What we learned
 - **Practical RAG + hybrid search** beats LLM-only pipelines for housing queries.  
 - **H3 + deck.gl** deliver city-scale intuition in a lightweight way.  
 - UX clarity (“why this match?”) builds trust and adoption.  
@@ -60,7 +60,7 @@ Housing search is fragmented and stressful. Students don’t just need listings�
 
 ---
 
-## 🔮 What’s next
+## What’s next
 - Landlord dashboard + **group application packages**.  
 - Verified **safety/accessibility layers**, notifications, and waitlists.  
 - Full **Databricks job orchestration** for nightly refresh.  
@@ -68,9 +68,9 @@ Housing search is fragmented and stressful. Students don’t just need listings�
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 - **Design** → Figma  
-- **Frontend** → Vanilla JS, HTML, CSS, deck.gl, h3-js  
+- **Frontend** → Vite, Vanilla JS, HTML, CSS, deck.gl, h3-js  
 - **Backend** → Python, FastAPI, Uvicorn  
 - **Database & Search** → Supabase Postgres + pgvector  
 - **ETL & Embeddings** → Databricks (Delta, PySpark, Pandas, sentence-transformers)  
